@@ -1,5 +1,5 @@
 # Estado del Proyecto: CLab PUCV
-
+(Nombre sujeto a cambios)
 Este documento resume los avances reales implementados hasta la fecha, el trabajo pendiente de pulido y las tareas recomendadas a futuro. Ideal para orientar a los colaboradores en el estado actual de la plataforma de enseñanza de lenguaje C.
 
 ##  Avances Reales Completados
@@ -33,7 +33,7 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
 ---
 
 ##  Implementaciones a Futuro
-
+ (Cambiar al integrar algo al sistema o agregar una nueva funcionalidad que no se encuentre en la lista)
 1. **Gestor de Contenidos (CRUD de Lecciones)**:
    - Permitir a los Profesores/Admins crear, editar y estructurar módulos y lecciones desde su panel, para que las vistas del estudiante se alimenten dinámicamente de la Base de Datos.
 2. **Sistema de Evaluación Automática**:
@@ -45,7 +45,7 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
 
 ---
 
-##  Cómo iniciar el proyecto localmente (Sin errores)
+##  Cómo iniciar el proyecto localmente
 
 Para que cualquier desarrollador pueda clonar e iniciar este entorno de trabajo desde cero, debe seguir estos pasos en orden:
 
