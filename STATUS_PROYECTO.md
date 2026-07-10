@@ -18,6 +18,9 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
 - **Ejecución Interactiva (Sandbox)**: Se desarrolló un controlador (`SandboxController`) que recibe el código C del cliente, crea un entorno temporal (`/storage/app/sandbox`), compila el programa utilizando `gcc` vía `Symfony\Component\Process\Process`, lo ejecuta de manera segura y captura tanto la salida estándar como los errores para devolverlos a la interfaz web.
 - **API de OpenAI**: Se construyó el controlador (`AiTutorController`) para el chat del tutor IA conectándose a través del cliente HTTP a la API REST de OpenAI.
 - **Inicio de Sesión Institucional (Google)**: Se instaló y configuró `laravel/socialite` para la autenticación vía Google. El `GoogleLoginController` valida estrictamente que el usuario se registre utilizando el dominio institucional `@mail.pucv.cl`.
+- **Gestión de Usuarios y Permisos**: Se creó una vista administrativa donde los profesores y administradores pueden ver todos los usuarios registrados y modificar sus roles (`admin`, `teacher`, `student`).
+- **Gestión de Currículo (Módulos y Lecciones)**: Se implementó un CRUD completo para gestionar el contenido del curso. Los profesores pueden crear módulos, ordenarlos y agregarles lecciones (con soporte para contenido en Markdown y enlaces a videos). Las vistas de estudiantes ahora consumen estos datos dinámicamente desde la base de datos.
+- **Gestión de Material de Apoyo**: Se habilitó una sección para que profesores y administradores puedan subir archivos PDF (teoría y ejercicios). Los estudiantes tienen acceso de solo lectura a este material a través de la pestaña "Documentación" en su entorno.
 
 ---
 
@@ -28,20 +31,17 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
    - **Google OAuth**: Para probar el inicio de sesión institucional, se requiere crear las credenciales en *Google Cloud Console* y agregarlas (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`) al `.env`.
 2. **Seguridad Avanzada en la Sandbox**:
    - Aunque la ejecución en servidor tiene un *timeout* límite por proceso (evita bucles infinitos), el código se corre en el *host* nativo. Se recomienda encapsular la ejecución en un contenedor (ej. Docker, chroot o Firejail) para prevenir inyecciones maliciosas a nivel del sistema operativo.
-3. **Contenido Quemado en Vista**:
-   - Parte del temario y teoría en `Lesson.vue` actualmente está fijo en el código del frontend (Hardcoded). Debe planearse su separación de los componentes visuales.
 
 ---
 
 ##  Implementaciones a Futuro
  (Cambiar al integrar algo al sistema o agregar una nueva funcionalidad que no se encuentre en la lista)
-1. **Gestor de Contenidos (CRUD de Lecciones)**:
-   - Permitir a los Profesores/Admins crear, editar y estructurar módulos y lecciones desde su panel, para que las vistas del estudiante se alimenten dinámicamente de la Base de Datos.
-2. **Sistema de Evaluación Automática**:
+
+1. **Sistema de Evaluación Automática**:
    - Crear ejercicios de programación donde la Sandbox del estudiante reciba entradas ocultas, se contraste la salida real con una salida esperada, y se otorgue una calificación o desbloqueo automático del siguiente módulo.
-3. **Tutor IA Contextual**:
+2. **Tutor IA Contextual**:
    - Enlazar el editor de código con el Chat de IA. Si un estudiante compila y tiene un error, enviarle automáticamente el código fallido a la IA para que el tutor ofrezca consejos de resolución más precisos sin que el estudiante deba explicarlo todo manualmente.
-4. **Progreso y Gamificación**:
+3. **Progreso y Gamificación**:
    - Añadir una tabla pivote en la base de datos para medir el progreso del estudiante (lecciones completadas, porcentaje del curso) y mostrar un dashboard estudiantil mucho más interactivo (barras de experiencia, medallas, etc).
 
 ---

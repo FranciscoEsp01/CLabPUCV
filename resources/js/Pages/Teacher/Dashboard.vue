@@ -37,19 +37,19 @@ defineProps({
                 <!-- Stats / Quick Links -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Módulos Activos</h4>
-                        <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">{{ stats.active_courses }}</p>
-                        <p class="text-sm text-gray-500 mt-2 hover:text-blue-500 cursor-pointer transition-colors">Gestionar currículo &rarr;</p>
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Materiales y Ejercicios</h4>
+                        <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">PDFs</p>
+                        <Link :href="route('teacher.materials.index')" class="text-sm text-gray-500 mt-2 hover:text-blue-500 cursor-pointer transition-colors block">Gestionar materiales &rarr;</Link>
                     </div>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                         <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Estudiantes Registrados</h4>
                         <p class="text-4xl font-bold text-green-600 dark:text-green-400">{{ stats.total_students }}</p>
-                        <p class="text-sm text-gray-500 mt-2 hover:text-green-500 cursor-pointer transition-colors">Ver lista completa &rarr;</p>
+                        <Link :href="route('teacher.users.index')" class="text-sm text-gray-500 mt-2 hover:text-green-500 cursor-pointer transition-colors block">Gestionar usuarios &rarr;</Link>
                     </div>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Revisiones Pendientes</h4>
-                        <p class="text-4xl font-bold text-purple-600 dark:text-purple-400">{{ stats.pending_reviews }}</p>
-                        <p class="text-sm text-gray-500 mt-2 hover:text-purple-500 cursor-pointer transition-colors">Revisar envíos &rarr;</p>
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Módulos Activos</h4>
+                        <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">{{ stats.active_courses }}</p>
+                        <Link :href="route('teacher.course.index')" class="text-sm text-gray-500 mt-2 hover:text-blue-500 cursor-pointer transition-colors block">Gestionar currículo &rarr;</Link>
                     </div>
                 </div>
 

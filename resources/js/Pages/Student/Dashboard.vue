@@ -3,14 +3,16 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+const props = defineProps({
+    modules_data: {
+        type: Array,
+        required: true,
+        default: () => []
+    }
+});
+
 const points = ref(450);
 const rank = ref('Novato C');
-
-const modules = [
-    { id: 1, title: 'Introducción a C', status: 'Completado', icon: 'M13 10V3L4 14h7v7l9-11h-7z', color: 'text-green-500 dark:text-green-400' },
-    { id: 2, title: 'Punteros y Memoria', status: 'En Progreso', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', color: 'text-blue-500 dark:text-blue-400' },
-    { id: 3, title: 'Estructuras de Datos', status: 'Bloqueado', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', color: 'text-gray-400 dark:text-gray-500' },
-];
 </script>
 
 <template>
@@ -79,24 +81,29 @@ const modules = [
                 <div>
                     <h4 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tu Plan de Estudios</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div v-for="mod in modules" :key="mod.id" class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-md hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300 transform hover:-translate-y-1">
+                        <div v-for="mod in modules_data" :key="mod.id" class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-md hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300 transform hover:-translate-y-1">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                    <svg class="w-6 h-6" :class="mod.color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="mod.icon"></path>
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                     </svg>
                                 </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" 
-                                      :class="{
-                                          'bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-400': mod.status === 'Completado',
-                                          'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400': mod.status === 'En Progreso',
-                                          'bg-gray-100 text-gray-500 dark:bg-gray-600/30 dark:text-gray-400': mod.status === 'Bloqueado'
-                                      }">
-                                    {{ mod.status }}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400">
+                                    Módulo {{ mod.order }}
                                 </span>
                             </div>
                             <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ mod.title }}</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Módulo {{ mod.id }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ mod.description || 'Sin descripción' }}</p>
+                            
+                            <div v-if="mod.lessons && mod.lessons.length > 0" class="space-y-2">
+                                <h6 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Lecciones</h6>
+                                <Link v-for="lesson in mod.lessons" :key="lesson.id" :href="route('student.lesson.show', lesson.id)" class="block px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-colors text-sm text-gray-700 dark:text-gray-300">
+                                    {{ lesson.order }}. {{ lesson.title }}
+                                </Link>
+                            </div>
+                            <div v-else class="text-sm text-gray-500 dark:text-gray-400 italic mt-4">
+                                Aún no hay lecciones
+                            </div>
                         </div>
                     </div>
                 </div>

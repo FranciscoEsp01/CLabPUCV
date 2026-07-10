@@ -83,8 +83,8 @@ const sendMessage = async () => {
                                     Dashboard Estudiante
                                 </NavLink>
                                 <NavLink
-                                    :href="route('student.lesson')"
-                                    :active="route().current('student.lesson')"
+                                    :href="route('student.materials.index')"
+                                    :active="route().current('student.materials.index')"
                                 >
                                     Documentación
                                 </NavLink>
@@ -223,8 +223,8 @@ const sendMessage = async () => {
                             Dashboard Estudiante
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            :href="route('student.lesson')"
-                            :active="route().current('student.lesson')"
+                            :href="route('student.materials.index')"
+                            :active="route().current('student.materials.index')"
                         >
                             Documentación
                         </ResponsiveNavLink>
