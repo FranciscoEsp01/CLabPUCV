@@ -1,5 +1,6 @@
 # Estado del Proyecto: CLab PUCV
 (Nombre sujeto a cambios)
+
 Este documento resume los avances reales implementados hasta la fecha, el trabajo pendiente de pulido y las tareas recomendadas a futuro. Ideal para orientar a los colaboradores en el estado actual de la plataforma de enseñanza de lenguaje C.
 
 ##  Avances Reales Completados
