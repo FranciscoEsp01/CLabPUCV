@@ -41,9 +41,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->prefix('app')->name('student.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\StudentController::class, 'dashboard'])->name('dashboard');
     
-    Route::get('/leaderboard', function () {
-        return Inertia::render('Student/Leaderboard');
-    })->name('leaderboard');
+    Route::get('/leaderboard', [\App\Http\Controllers\StudentController::class, 'leaderboard'])->name('leaderboard');
     
     Route::get('/sandbox', function () {
         return Inertia::render('Student/Sandbox');

@@ -55,10 +55,18 @@ class CourseManagementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'video_url' => 'nullable|url',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
             'order' => 'integer'
         ]);
 
-        $module->lessons()->create($request->all());
+        $data = $request->except('pdf_file');
+
+        if ($request->hasFile('pdf_file')) {
+            $path = $request->file('pdf_file')->store('pdfs', 'public');
+            $data['pdf_path'] = '/storage/' . $path;
+        }
+
+        $module->lessons()->create($data);
 
         return redirect()->back()->with('success', 'Lección agregada correctamente.');
     }
@@ -69,10 +77,18 @@ class CourseManagementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'video_url' => 'nullable|string',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
             'order' => 'integer'
         ]);
 
-        $lesson->update($request->all());
+        $data = $request->except('pdf_file');
+
+        if ($request->hasFile('pdf_file')) {
+            $path = $request->file('pdf_file')->store('pdfs', 'public');
+            $data['pdf_path'] = '/storage/' . $path;
+        }
+
+        $lesson->update($data);
 
         return redirect()->back()->with('success', 'Lección actualizada correctamente.');
     }

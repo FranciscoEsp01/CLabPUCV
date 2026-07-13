@@ -42,6 +42,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        $email = $this->string('email')->value();
+        if (!str_ends_with($email, '@mail.pucv.cl')) {
+            $user = \App\Models\User::where('email', $email)->first();
+            if (! $user || ! $user->isAdmin()) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => 'El acceso está restringido a correos institucionales (@mail.pucv.cl).',
+                ]);
+            }
+        }
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 

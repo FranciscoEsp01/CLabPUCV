@@ -25,6 +25,7 @@ class User extends Authenticatable
         'avatar',
         'points',
         'role_id',
+        'role',
     ];
 
     /**
@@ -50,9 +51,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function role(): BelongsTo
+    public function roleModel(): BelongsTo
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function submissions(): HasMany
@@ -60,13 +61,23 @@ class User extends Authenticatable
         return $this->hasMany(Submission::class);
     }
 
+    public function lessons(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class)->withPivot('is_completed')->withTimestamps();
+    }
+
     public function isTeacher(): bool
     {
-        return $this->role && $this->role->name === 'teacher';
+        return $this->role === 'teacher' || $this->role === 'admin';
     }
 
     public function isStudent(): bool
     {
-        return $this->role && $this->role->name === 'student';
+        return $this->role === 'student';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }

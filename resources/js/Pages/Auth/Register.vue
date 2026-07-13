@@ -51,6 +51,9 @@ const submit = () => {
                     v-model="form.email"
                     required
                     autocomplete="username"
+                    placeholder="tu.nombre@mail.pucv.cl"
+                    pattern=".*@mail\.pucv\.cl$"
+                    title="Debe ser un correo institucional (@mail.pucv.cl)"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />

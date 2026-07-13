@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     modules_data: {
@@ -11,7 +11,8 @@ const props = defineProps({
     }
 });
 
-const points = ref(450);
+const page = usePage();
+const points = computed(() => page.props.auth.user.points || 0);
 const rank = ref('Novato C');
 </script>
 
@@ -33,7 +34,7 @@ const rank = ref('Novato C');
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-100/50 to-purple-100/50 dark:from-blue-600/20 dark:to-purple-600/20 opacity-50 group-hover:opacity-100 transition duration-700"></div>
                     <div class="p-8 relative z-10 flex flex-col md:flex-row items-center justify-between">
                         <div>
-                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">¡Hola, Estudiante!</h3>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">¡Hola, {{ page.props.auth.user.name }}!</h3>
                             <p class="text-gray-600 dark:text-gray-400">Continúa tu aprendizaje en ANSI C. Estás haciendo un gran progreso.</p>
                         </div>
                         <div class="mt-6 md:mt-0 flex items-center space-x-6">
@@ -65,16 +66,16 @@ const rank = ref('Novato C');
                         </Link>
                     </div>
 
-                    <div class="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-xl flex flex-col items-center justify-center text-center transition-colors duration-300">
-                        <div class="w-20 h-20 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 border-4 border-gray-100 dark:border-gray-600 shadow-sm">
+                    <Link :href="route('student.leaderboard')" class="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-xl flex flex-col items-center justify-center text-center transition-all duration-300 transform hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-500 group cursor-pointer block">
+                        <div class="w-20 h-20 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 border-4 border-gray-100 dark:border-gray-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
                             <svg class="w-10 h-10 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         </div>
                         <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Clasificación</h4>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Descubre en qué posición estás frente a tus compañeros.</p>
-                        <Link :href="route('student.leaderboard')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors">
+                        <span class="text-blue-600 dark:text-blue-400 font-medium transition-colors group-hover:text-blue-800 dark:group-hover:text-blue-300">
                             Ver Leaderboard &rarr;
-                        </Link>
-                    </div>
+                        </span>
+                    </Link>
                 </div>
 
                 <!-- Modules Roadmap -->

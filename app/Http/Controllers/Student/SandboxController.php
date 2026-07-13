@@ -138,7 +138,15 @@ class SandboxController extends Controller
                 ->exists();
 
             if (!$alreadyPassed && $question->quiz) {
-                $user->increment('points', $question->quiz->points_reward ?? 10);
+                $points = rand(27, 32);
+                $user->increment('points', $points);
+                
+                // Marcar la lección como completada en la tabla pivote
+                if ($question->quiz->lesson_id) {
+                    $user->lessons()->syncWithoutDetaching([
+                        $question->quiz->lesson_id => ['is_completed' => true]
+                    ]);
+                }
             }
         }
 

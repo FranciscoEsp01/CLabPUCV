@@ -21,6 +21,7 @@ const newLessonForm = useForm({
     title: '',
     content: '',
     video_url: '',
+    pdf_file: null,
     order: 0
 });
 
@@ -126,9 +127,15 @@ const deleteLesson = (id) => {
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenido (Texto/Markdown)</label>
                                 <textarea v-model="newLessonForm.content" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" rows="3"></textarea>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Orden</label>
-                                <input v-model="newLessonForm.order" type="number" class="mt-1 block w-24 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Orden</label>
+                                    <input v-model="newLessonForm.order" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivo PDF (Opcional)</label>
+                                    <input type="file" @input="newLessonForm.pdf_file = $event.target.files[0]" accept="application/pdf" class="mt-1 block w-full text-gray-700 dark:text-gray-300" />
+                                </div>
                             </div>
                             <div class="flex justify-end gap-2">
                                 <button type="button" @click="selectedModuleForLesson = null" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancelar</button>

@@ -33,4 +33,16 @@ class StudentController extends Controller
             'materials' => $materials
         ]);
     }
+
+    public function leaderboard()
+    {
+        $topStudents = \App\Models\User::where('role', 'student')
+            ->orderBy('points', 'desc')
+            ->take(10)
+            ->get(['id', 'name', 'avatar', 'points']);
+            
+        return Inertia::render('Student/Leaderboard', [
+            'topStudents' => $topStudents
+        ]);
+    }
 }

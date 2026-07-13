@@ -28,10 +28,13 @@ class GoogleAuthController extends Controller
             $googleUser = Socialite::driver('google')->user();
             
             // Validación estricta de dominio
-            $allowedDomain = '@mail.pucv';
+            $allowedDomain = '@mail.pucv.cl';
             if (!str_ends_with($googleUser->email, $allowedDomain)) {
-                return redirect()->route('login')
-                    ->with('error', 'El acceso está restringido exclusivamente a correos institucionales de la PUCV (@mail.pucv).');
+                $existingUser = User::where('email', $googleUser->email)->first();
+                if (! $existingUser || ! $existingUser->isAdmin()) {
+                    return redirect()->route('login')
+                        ->with('error', 'El acceso está restringido exclusivamente a correos institucionales de la PUCV (@mail.pucv.cl).');
+                }
             }
 
             $userExists = User::where('email', $googleUser->email)->exists();
