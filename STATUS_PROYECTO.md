@@ -10,17 +10,17 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
 - **Layout y Navegación**: Se dividió la plataforma en rutas protegidas para estudiantes (`/student`) y profesores (`/teacher`).
 - **Editor de Código (Sandbox)**: Se integró el paquete `@guolao/vue-monaco-editor` para proporcionar un entorno de programación profesional con resaltado de sintaxis ANSI C.
 - **Tutor IA Global**: Se programó un widget flotante en la esquina inferior derecha (`AiTutor.vue`) inyectado en el Layout global para consultar a la inteligencia artificial en cualquier pantalla.
-- **Vistas Estudiantiles**: Se estructuraron los componentes para el Dashboard de inicio, la vista de Lecciones y Documentación, y el panel dividido para el Sandbox.
-
+- **Vistas Estudiantiles**: Se estructuraron los componentes para el Dashboard de inicio (reflejando nombre y puntos reales), la vista interactiva de Lecciones (con pantalla dividida integrando Documentos/PDF y el Sandbox), y la nueva vista de Clasificación (Leaderboard).
 ### 2. Backend y Base de Datos (Laravel 11)
 - **Sistema de Roles**: Se agregó una columna `role` a la tabla `users` mediante migraciones. Se configuró el middleware de validación `CheckRole` para proteger las rutas y vistas.
 - **Panel de Profesor Dinámico**: El controlador `TeacherController` actualmente consulta a la base de datos para extraer métricas en vivo (ej. cantidad de estudiantes registrados) y listarlos en la vista del Dashboard de Profesor.
 - **Ejecución Interactiva (Sandbox)**: Se desarrolló un controlador (`SandboxController`) que recibe el código C del cliente, crea un entorno temporal (`/storage/app/sandbox`), compila el programa utilizando `gcc` vía `Symfony\Component\Process\Process`, lo ejecuta de manera segura y captura tanto la salida estándar como los errores para devolverlos a la interfaz web.
 - **API de OpenAI**: Se construyó el controlador (`AiTutorController`) para el chat del tutor IA conectándose a través del cliente HTTP a la API REST de OpenAI.
-- **Inicio de Sesión Institucional (Google)**: Se instaló y configuró `laravel/socialite` para la autenticación vía Google. El `GoogleLoginController` valida estrictamente que el usuario se registre utilizando el dominio institucional `@mail.pucv.cl`.
+- **Inicio de Sesión Institucional (Google y Local)**: Se configuró tanto el registro local (Breeze) como la autenticación vía Google (Socialite) para validar y restringir el acceso exclusivamente a correos con el dominio `@mail.pucv.cl` (con excepciones para administradores).
 - **Gestión de Usuarios y Permisos**: Se creó una vista administrativa donde los profesores y administradores pueden ver todos los usuarios registrados y modificar sus roles (`admin`, `teacher`, `student`).
-- **Gestión de Currículo (Módulos y Lecciones)**: Se implementó un CRUD completo para gestionar el contenido del curso. Los profesores pueden crear módulos, ordenarlos y agregarles lecciones (con soporte para contenido en Markdown y enlaces a videos). Las vistas de estudiantes ahora consumen estos datos dinámicamente desde la base de datos.
-- **Gestión de Material de Apoyo**: Se habilitó una sección para que profesores y administradores puedan subir archivos PDF (teoría y ejercicios). Los estudiantes tienen acceso de solo lectura a este material a través de la pestaña "Documentación" en su entorno.
+- **Gestión de Currículo (Módulos y Lecciones)**: Se implementó un CRUD completo para gestionar el contenido del curso. Los profesores pueden crear módulos, ordenarlos y agregarles lecciones (con soporte para contenido en Markdown, enlaces a videos y adjuntar archivos PDF). Las vistas de estudiantes consumen estos datos dinámicamente desde la base de datos.
+- **Gestión de Material de Apoyo**: Se habilitó una sección para que profesores y administradores puedan subir archivos PDF (teoría y ejercicios). Los estudiantes tienen acceso de solo lectura a este material.
+- **Gamificación y Leaderboard**: Se implementó una tabla de clasificación (Leaderboard) donde los estudiantes pueden ver su progreso y puntaje en comparación al resto del curso, sincronizado dinámicamente con sus perfiles.
 
 ---
 
