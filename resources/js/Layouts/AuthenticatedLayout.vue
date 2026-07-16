@@ -96,6 +96,7 @@ const sendMessage = async () => {
                                 </NavLink>
                                 <!-- Link to teacher (can be gated by role later) -->
                                 <NavLink
+                                    v-if="$page.props.auth.user.is_teacher"
                                     :href="route('teacher.dashboard')"
                                     :active="route().current('teacher.dashboard')"
                                 >
@@ -235,6 +236,7 @@ const sendMessage = async () => {
                             Sandbox
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
+                            v-if="$page.props.auth.user.is_teacher"
                             :href="route('teacher.dashboard')"
                             :active="route().current('teacher.dashboard')"
                         >

@@ -22,7 +22,10 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    if (auth()->check() && auth()->user()->isTeacher()) {
+        return redirect()->route('teacher.dashboard');
+    }
+    return redirect()->route('student.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

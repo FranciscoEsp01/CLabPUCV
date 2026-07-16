@@ -11,7 +11,14 @@ class StudentController extends Controller
 {
     public function dashboard()
     {
-        $modules = Module::with('lessons')->orderBy('order')->get();
+        $modules = Module::with('lessons')
+            ->where('is_visible', true)
+            ->where(function ($query) {
+                $query->whereNull('available_from')
+                      ->orWhere('available_from', '<=', now());
+            })
+            ->orderBy('order')
+            ->get();
         
         return Inertia::render('Student/Dashboard', [
             'modules_data' => $modules
@@ -21,6 +28,13 @@ class StudentController extends Controller
     public function showLesson(Lesson $lesson)
     {
         $lesson->load('module');
+        
+        // Verificar si el módulo es visible y está disponible
+        $module = $lesson->module;
+        if (!$module->is_visible || ($module->available_from && $module->available_from > now())) {
+            abort(403, 'Esta lección aún no está disponible.');
+        }
+
         return Inertia::render('Student/Lesson', [
             'lesson' => $lesson
         ]);

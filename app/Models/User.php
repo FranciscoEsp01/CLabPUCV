@@ -39,6 +39,15 @@ class User extends Authenticatable
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'is_teacher',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -69,6 +78,11 @@ class User extends Authenticatable
     public function isTeacher(): bool
     {
         return $this->role === 'teacher' || $this->role === 'admin';
+    }
+
+    public function getIsTeacherAttribute(): bool
+    {
+        return $this->isTeacher();
     }
 
     public function isStudent(): bool

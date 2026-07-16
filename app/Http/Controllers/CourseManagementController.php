@@ -22,7 +22,9 @@ class CourseManagementController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'order' => 'integer'
+            'order' => 'integer',
+            'is_visible' => 'boolean',
+            'available_from' => 'nullable|date'
         ]);
 
         Module::create($request->all());
@@ -35,7 +37,9 @@ class CourseManagementController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'order' => 'integer'
+            'order' => 'integer',
+            'is_visible' => 'boolean',
+            'available_from' => 'nullable|date'
         ]);
 
         $module->update($request->all());

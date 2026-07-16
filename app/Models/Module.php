@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Module extends Model
 {
-    protected $fillable = ['title', 'description', 'order'];
+    protected $fillable = ['title', 'description', 'order', 'is_visible', 'available_from'];
+
+    protected $casts = [
+        'is_visible' => 'boolean',
+        'available_from' => 'datetime',
+    ];
 
     public function lessons()
     {
