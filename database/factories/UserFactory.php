@@ -24,13 +24,37 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $userName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', fake()->userName()));
+        
         return [
             'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'email' => strtolower($userName . '_' . Str::random(5) . '@mail.pucv.cl'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'student',
+            'points' => 0,
         ];
+    }
+
+    /**
+     * Indicate that the user is a teacher.
+     */
+    public function teacher(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'teacher',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
     }
 
     /**

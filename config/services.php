@@ -41,4 +41,20 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL', 'http://localhost:8000/auth/google/callback'),
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
+    ],
+
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'url' => env('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions'),
+    ],
+
+    'judge0' => [
+        'url' => env('JUDGE0_API_URL', 'https://judge0-ce.p.rapidapi.com'),
+        'key' => env('JUDGE0_API_KEY'),
+    ],
+
 ];

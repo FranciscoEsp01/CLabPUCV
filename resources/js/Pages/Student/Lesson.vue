@@ -1,9 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor';
 import axios from 'axios';
+
+const page = usePage();
 
 // Estado del contenido
 const currentTab = ref('doc'); // 'doc' o 'video'
@@ -34,15 +36,25 @@ onMounted(() => {
 
 const runCode = async () => {
     isCompiling.value = true;
-    output.value = 'Compilando y ejecutando...';
+    output.value = 'Compilando y ejecutando en entorno seguro...';
     
     try {
+        const headers = {};
+        const jwtToken = page.props?.auth?.jwt_token;
+        if (jwtToken) {
+            headers['Authorization'] = `Bearer ${jwtToken}`;
+        }
+
         const response = await axios.post(route('student.sandbox.execute'), {
             code: code.value
-        });
+        }, { headers });
         output.value = response.data.output;
     } catch (error) {
-        output.value = 'Ocurrió un error de comunicación con el servidor.';
+        if (error.response?.data?.output) {
+            output.value = error.response.data.output;
+        } else {
+            output.value = 'Ocurrió un error de comunicación con el servidor.';
+        }
         console.error(error);
     } finally {
         isCompiling.value = false;

@@ -28,8 +28,8 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
+                'name' => 'Test User Updated',
+                'email' => 'updated.user@mail.pucv.cl',
             ]);
 
         $response
@@ -38,9 +38,23 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('Test User Updated', $user->name);
+        $this->assertSame('updated.user@mail.pucv.cl', $user->email);
         $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_profile_email_cannot_be_updated_to_non_pucv_domain_for_students(): void
+    {
+        $user = User::factory()->create(['role' => 'student']);
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => 'Hacked Name',
+                'email' => 'hacked@gmail.com',
+            ]);
+
+        $response->assertSessionHasErrors(['email']);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

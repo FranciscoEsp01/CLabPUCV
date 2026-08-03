@@ -3,33 +3,38 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use App\Models\QuizQuestion;
 use App\Models\Submission;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Security\CSourceSecurityValidator;
+use App\Services\Security\SecurityAuditLogger;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class SandboxController extends Controller
 {
     /**
      * URL base de la API de Judge0.
-     * En producción, esto debería estar en una variable de entorno (ej. env('JUDGE0_API_URL')).
      */
-    private $judge0Url = 'https://judge0-ce.p.rapidapi.com';
+    private string $judge0Url;
 
     /**
-     * ID del lenguaje en Judge0 para C (GCC). Puede variar según la versión de Judge0.
+     * ID del lenguaje en Judge0 para C (GCC).
      */
-    private $languageId = 50;
+    private int $languageId = 50;
+
+    public function __construct()
+    {
+        $this->judge0Url = config('services.judge0.url', env('JUDGE0_API_URL', 'https://judge0-ce.p.rapidapi.com'));
+    }
 
     /**
      * Muestra la vista del Sandbox (Editor de código)
      */
     public function index()
     {
-        // En Inertia.js (Vue) se renderizará el componente del editor.
-        // Aquí podríamos cargar un desafío de prueba o permitir código libre.
         return inertia('Student/Sandbox');
     }
 
@@ -39,9 +44,37 @@ class SandboxController extends Controller
     public function compile(Request $request)
     {
         $request->validate([
-            'quiz_question_id' => 'required|exists:quiz_questions,id',
-            'source_code' => 'required|string',
+            'quiz_question_id' => ['required', 'integer', 'exists:quiz_questions,id'],
+            'source_code' => ['required', 'string', 'max:' . CSourceSecurityValidator::MAX_CODE_LENGTH],
         ]);
+
+        $studentCode = $request->input('source_code');
+
+        // Security check on submitted student code
+        $securityCheck = CSourceSecurityValidator::validate($studentCode);
+        if (!$securityCheck['isValid']) {
+            SecurityAuditLogger::logViolation(
+                'STUDENT_SANDBOX_SECURITY_BLOCK',
+                'Intento de envío de código con instrucciones no autorizadas.',
+                [
+                    'question_id' => $request->quiz_question_id,
+                    'rule' => $securityCheck['rule'],
+                    'reason' => $securityCheck['reason'],
+                ],
+                $request
+            );
+
+            return response()->json([
+                'status' => 'error',
+                'results' => [
+                    [
+                        'status' => 'error',
+                        'message' => 'Violación de directiva de seguridad.',
+                        'details' => $securityCheck['reason']
+                    ]
+                ]
+            ], 422);
+        }
 
         $question = QuizQuestion::with('testCases')->findOrFail($request->quiz_question_id);
         
@@ -49,71 +82,74 @@ class SandboxController extends Controller
             return response()->json(['error' => 'Esta pregunta no es un reto de código.'], 400);
         }
 
-        $studentCode = $request->source_code;
         $testCases = $question->testCases;
-        
         $allPassed = true;
         $results = [];
 
+        $judge0Key = config('services.judge0.key', env('JUDGE0_API_KEY', ''));
+
         foreach ($testCases as $testCase) {
-            // Se puede inyectar el código del estudiante dentro del boilerplate o enviar directamente.
-            // Para ANSI C, si el estudiante solo hizo la función, se fusiona:
             $mergedCode = $this->mergeCode($studentCode, $question->boilerplate_code);
 
-            // Preparar el payload para Judge0
             $payload = [
                 'language_id' => $this->languageId,
                 'source_code' => $mergedCode,
-                'stdin' => $testCase->input,
+                'stdin' => (string) $testCase->input,
             ];
 
             try {
-                // Realizar petición a Judge0
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
-                    // Importante: Configura tus API Keys en el .env
                     'X-RapidAPI-Host' => 'judge0-ce.p.rapidapi.com',
-                    'X-RapidAPI-Key' => env('JUDGE0_API_KEY', 'default_key_here')
-                ])->post("{$this->judge0Url}/submissions?base64_encoded=false&wait=true", $payload);
+                    'X-RapidAPI-Key' => $judge0Key,
+                ])->timeout(10)->post("{$this->judge0Url}/submissions?base64_encoded=false&wait=true", $payload);
 
                 if ($response->successful()) {
                     $data = $response->json();
                     
-                    // Judge0 devuelve el stdout o stderr dependiendo de si compiló bien o no.
                     $stdout = trim($data['stdout'] ?? '');
                     $stderr = trim($data['stderr'] ?? '');
                     $compileOutput = trim($data['compile_output'] ?? '');
 
-                    // Comprobar si hubo un error de compilación
                     if (!empty($compileOutput) || !empty($stderr)) {
                         $allPassed = false;
                         $results[] = [
                             'status' => 'error',
                             'message' => 'Error de compilación o ejecución.',
-                            'details' => $compileOutput ?: $stderr
+                            'details' => Str::limit($compileOutput ?: $stderr, 2000)
                         ];
-                        break; // Detener evaluación al primer error grave
+                        break;
                     }
 
-                    // Verificar contra la salida esperada
                     $expected = trim($testCase->expected_output);
                     if ($stdout === $expected) {
-                        $results[] = ['status' => 'passed', 'input' => $testCase->input, 'output' => $stdout];
+                        $results[] = [
+                            'status' => 'passed',
+                            'input' => $testCase->is_hidden ? 'Oculto' : $testCase->input,
+                            'output' => $stdout
+                        ];
                     } else {
                         $allPassed = false;
                         $results[] = [
                             'status' => 'failed',
-                            'expected' => $expected,
-                            'actual' => $stdout,
+                            'expected' => $testCase->is_hidden ? 'Oculto' : $expected,
+                            'actual' => Str::limit($stdout, 1000),
                             'input' => $testCase->is_hidden ? 'Oculto' : $testCase->input
                         ];
                     }
                 } else {
-                    return response()->json(['error' => 'Error al comunicarse con el servidor de compilación.'], 500);
+                    return response()->json(['error' => 'No fue posible evaluar la prueba en este momento. Inténtelo más tarde.'], 502);
                 }
 
             } catch (Exception $e) {
-                return response()->json(['error' => 'Excepción del servidor: ' . $e->getMessage()], 500);
+                SecurityAuditLogger::logViolation(
+                    'JUDGE0_API_EXCEPTION',
+                    'Fallo de conexión o respuesta inválida de Judge0.',
+                    ['exception' => $e->getMessage()],
+                    $request
+                );
+
+                return response()->json(['error' => 'Error de comunicación con el motor de evaluación.'], 500);
             }
         }
 
@@ -157,21 +193,19 @@ class SandboxController extends Controller
     }
 
     /**
-     * Función helper para fusionar el código del estudiante con la plantilla del profesor.
-     * Ejemplo: Insertar el código del estudiante donde exista un marcador // __STUDENT_CODE__
+     * Helper para fusionar el código del estudiante con la plantilla.
      */
-    private function mergeCode($studentCode, $boilerplate)
+    private function mergeCode(string $studentCode, ?string $boilerplate): string
     {
         if (empty($boilerplate)) {
             return $studentCode;
         }
 
         $marker = '// __STUDENT_CODE__';
-        if (strpos($boilerplate, $marker) !== false) {
+        if (str_contains($boilerplate, $marker)) {
             return str_replace($marker, $studentCode, $boilerplate);
         }
 
-        // Si no hay marcador, por defecto se concatena.
         return $studentCode . "\n" . $boilerplate;
     }
 }

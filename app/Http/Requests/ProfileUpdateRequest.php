@@ -16,16 +16,34 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        $emailRules = [
+            'required',
+            'string',
+            'lowercase',
+            'email',
+            'max:255',
+            Rule::unique(User::class)->ignore($user->id),
+        ];
+
+        // Non-admin users must maintain their @mail.pucv.cl institutional domain
+        if (!$user->isAdmin()) {
+            $emailRules[] = 'ends_with:@mail.pucv.cl';
+        }
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'email' => $emailRules,
+        ];
+    }
+
+    /**
+     * Custom validation messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.ends_with' => 'El correo electrónico debe pertenecer al dominio institucional (@mail.pucv.cl).',
         ];
     }
 }
