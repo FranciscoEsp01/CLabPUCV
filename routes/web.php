@@ -107,6 +107,9 @@ Route::middleware(['auth', 'verified', 'role:teacher,admin'])->prefix('teacher')
     // Gestión de usuarios y roles
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])
+        ->middleware('role:admin')
+        ->name('users.destroy');
     
     // Gestión de Cursos (Módulos y Lecciones)
     Route::get('/course-management', [CourseManagementController::class, 'index'])->name('course.index');

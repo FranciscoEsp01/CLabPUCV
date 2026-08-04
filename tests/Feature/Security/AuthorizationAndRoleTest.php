@@ -64,4 +64,56 @@ class AuthorizationAndRoleTest extends TestCase
         $response->assertSessionHasErrors();
         $this->assertEquals('admin', $admin->fresh()->role);
     }
+
+    public function test_student_cannot_delete_user(): void
+    {
+        $student = User::factory()->create(['role' => 'student']);
+        $targetUser = User::factory()->create(['role' => 'student']);
+
+        $response = $this->actingAs($student)->delete("/teacher/users/{$targetUser->id}");
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id]);
+    }
+
+    public function test_teacher_cannot_delete_user(): void
+    {
+        $teacher = User::factory()->teacher()->create();
+        $targetUser = User::factory()->create(['role' => 'student']);
+
+        $response = $this->actingAs($teacher)->delete("/teacher/users/{$targetUser->id}");
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id]);
+    }
+
+    public function test_admin_can_delete_user(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $targetUser = User::factory()->create(['role' => 'student']);
+
+        $response = $this->actingAs($admin)->delete("/teacher/users/{$targetUser->id}");
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
+    }
+
+    public function test_admin_cannot_delete_themselves(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->delete("/teacher/users/{$admin->id}");
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['user']);
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
+    public function test_admin_cannot_delete_last_remaining_admin(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $anotherAdmin = User::factory()->admin()->create();
+
+        // Si hay 2 admins, se puede borrar uno
+        $response = $this->actingAs($admin)->delete("/teacher/users/{$anotherAdmin->id}");
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('users', ['id' => $anotherAdmin->id]);
+    }
 }

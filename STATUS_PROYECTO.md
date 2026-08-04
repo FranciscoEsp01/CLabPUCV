@@ -54,9 +54,14 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
   - Bloqueo y redirección automática hacia la pantalla de verificación (`/verify-email`) para usuarios no verificados que intenten acceder al dashboard estudiantil, sandbox, lecciones o funciones docentes.
   - Interfaz gráfica moderna y responsiva (`VerifyEmail.vue`) con soporte para reenvío de correos, estado de carga y cierre de sesión.
   - Registro de eventos en auditoría de seguridad (`EMAIL_VERIFIED`, `EMAIL_VERIFICATION_RESENT`).
+- **Eliminación Segura de Usuarios (Exclusivo para Administradores):**
+  - **Control de Acceso Estricto:** Capacidad de eliminar usuarios a voluntad reservada única y exclusivamente para usuarios con rol `admin` (middleware `role:admin` y validación en controlador).
+  - **Mecanismos de Salvaguarda:** Bloqueo preventivo de auto-eliminación (un administrador no puede borrarse a sí mismo por accidente) y salvaguarda de persistencia mínima del sistema (impide eliminar al último administrador restante).
+  - **Limpieza en Cascada Transaccional:** Eliminación segura de entregas de código, archivos de material docente alojados en almacenamiento (`Storage`) y registros relacionales bajo transacciones atómicas de base de datos (`DB::transaction`).
+  - **UI/UX Administrativa Moderna:** Vista de usuarios (`Users.vue`) renovada con tarjetas de métricas en vivo (Total, Estudiantes, Profesores, Administradores), buscador en tiempo real por nombre/correo, selector de filtros por rol y modal de confirmación con advertencia de irreversibilidad.
 - **Auditoría y Suite de Pruebas de Seguridad:**
-  - Servicio `SecurityAuditLogger` para registrar incidentes, accesos denegados, violaciones de sandbox, fallos/éxitos de JWT, verificación de correo y cambios de roles.
-  - Batería completa de 68 pruebas automatizadas con 194 aserciones de seguridad, JWT, Sandbox, Verificación de Email y Tutor IA aprobadas al 100%.
+  - Servicio `SecurityAuditLogger` para registrar incidentes, accesos denegados, violaciones de sandbox, fallos/éxitos de JWT, verificación de correo, cambios de roles y eliminación de cuentas.
+  - Batería completa de **73 pruebas automatizadas** con **207 aserciones** de seguridad, JWT, Sandbox, Verificación de Email, Control de Roles y Eliminación Administrativa aprobadas al 100%.
 
 ---
 
