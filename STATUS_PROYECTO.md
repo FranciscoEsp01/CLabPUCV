@@ -46,9 +46,16 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
   - **Arquitectura de Respaldo Automático (Fallback):** Prioridad de respuesta con Groq (`llama-3.3-70b-versatile`) y derivación transparente a OpenAI (`gpt-3.5-turbo`) en caso de saturación o fallos de red.
   - **Directivas Anti-Jailbreak y Sanitización:** Filtrado de caracteres de control nulos/invisibles, limitación estricta de longitud (1500 chars) y directivas de rol pedagógico especializado en ANSI C para la PUCV con rechazo de consultas maliciosas.
   - **Memoria Conversacional y UI Optimizada:** Soporte de historial de turnos recientes, sugerencias de preguntas frecuentes ("chips"), animación de razonamiento y botón de reinicio de chat.
+- **Verificación Obligatoria de Correo Institucional (`MustVerifyEmail`):**
+  - Implementación de la interfaz `MustVerifyEmail` en el modelo `User` con validación estricta de cuentas `@mail.pucv.cl`.
+  - Envío automático de correo con enlace firmado temporal (expira en 60 minutos) tras el registro.
+  - Personalización de la plantilla de correo institucional con marca y presentación oficial de la **Pontificia Universidad Católica de Valparaíso** en español (`VerifyEmail::toMailUsing`).
+  - Bloqueo y redirección automática hacia la pantalla de verificación (`/verify-email`) para usuarios no verificados que intenten acceder al dashboard estudiantil, sandbox, lecciones o funciones docentes.
+  - Interfaz gráfica moderna y responsiva (`VerifyEmail.vue`) con soporte para reenvío de correos, estado de carga y cierre de sesión.
+  - Registro de eventos en auditoría de seguridad (`EMAIL_VERIFIED`, `EMAIL_VERIFICATION_RESENT`).
 - **Auditoría y Suite de Pruebas de Seguridad:**
-  - Servicio `SecurityAuditLogger` para registrar incidentes, accesos denegados, violaciones de sandbox, fallos/éxitos de JWT y cambios de roles.
-  - Batería completa de 65 pruebas automatizadas con 183 aserciones de seguridad, JWT, Sandbox y Tutor IA aprobadas al 100%.
+  - Servicio `SecurityAuditLogger` para registrar incidentes, accesos denegados, violaciones de sandbox, fallos/éxitos de JWT, verificación de correo y cambios de roles.
+  - Batería completa de 68 pruebas automatizadas con 194 aserciones de seguridad, JWT, Sandbox, Verificación de Email y Tutor IA aprobadas al 100%.
 
 ---
 

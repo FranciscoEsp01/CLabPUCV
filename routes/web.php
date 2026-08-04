@@ -66,16 +66,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Asistente IA (Tutor Inteligente de C) protegido con rate limiting
+    // Asistente IA (Tutor Inteligente de C) protegido con rate limiting y verificación
     Route::post('/api/ai-tutor/chat', [AiTutorController::class, 'chat'])
-        ->middleware('throttle:ai-tutor')
+        ->middleware(['verified', 'throttle:ai-tutor'])
         ->name('ai.chat');
 });
 
 // ==========================================
 // ZONA DE ESTUDIANTES
 // ==========================================
-Route::middleware(['auth'])->prefix('app')->name('student.')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('app')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/leaderboard', [StudentController::class, 'leaderboard'])->name('leaderboard');
     
@@ -94,7 +94,7 @@ Route::middleware(['auth'])->prefix('app')->name('student.')->group(function () 
 // ==========================================
 // ZONA DE PROFESORES Y ADMINISTRADORES
 // ==========================================
-Route::middleware(['auth', 'role:teacher,admin'])->prefix('teacher')->name('teacher.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:teacher,admin'])->prefix('teacher')->name('teacher.')->group(function () {
     Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
     
     // Materiales de estudio

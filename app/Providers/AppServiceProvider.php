@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +28,27 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         $this->configureRateLimiting();
+        $this->configureEmailVerification();
+    }
+
+    /**
+     * Configure custom institutional verification email.
+     */
+    protected function configureEmailVerification(): void
+    {
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+            $userName = $notifiable->name ?? 'Estudiante PUCV';
+            
+            return (new MailMessage)
+                ->subject('🔐 Verificación de Correo Institucional - CLab PUCV')
+                ->greeting("¡Hola, {$userName}!")
+                ->line('Te damos la bienvenida a **CLab PUCV**, la plataforma interactiva de aprendizaje de programación en C.')
+                ->line('Para activar tu cuenta y validar tu correo institucional (@mail.pucv.cl), por favor confirma tu dirección haciendo clic en el siguiente botón:')
+                ->action('Verificar mi Correo Electrónico', $url)
+                ->line('⏱️ Este enlace de verificación tiene una validez de 60 minutos.')
+                ->line('Si no has solicitado la creación de esta cuenta en CLab PUCV, puedes ignorar este correo de forma segura.')
+                ->salutation("Saludos cordiales,\n**Equipo Docente y Tecnológico de CLab PUCV**");
+        });
     }
 
     /**
