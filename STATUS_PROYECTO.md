@@ -48,7 +48,8 @@ Este documento resume los avances reales implementados hasta la fecha, el trabaj
   - **Memoria Conversacional y UI Optimizada:** Soporte de historial de turnos recientes, sugerencias de preguntas frecuentes ("chips"), animación de razonamiento y botón de reinicio de chat.
 - **Verificación Obligatoria de Correo Institucional (`MustVerifyEmail`):**
   - Implementación de la interfaz `MustVerifyEmail` en el modelo `User` con validación estricta de cuentas `@mail.pucv.cl`.
-  - Envío automático de correo con enlace firmado temporal (expira en 60 minutos) tras el registro.
+  - Envío automático de correo con enlace firmado temporal (expira en 60 minutos) exclusivamente al momento de registrar una nueva cuenta.
+  - **Retrocompatibilidad con Usuarios Preexistentes:** Migración automática para marcar como verificados a los usuarios registrados con anterioridad, evitando bloqueos innecesarios al iniciar sesión.
   - Personalización de la plantilla de correo institucional con marca y presentación oficial de la **Pontificia Universidad Católica de Valparaíso** en español (`VerifyEmail::toMailUsing`).
   - Bloqueo y redirección automática hacia la pantalla de verificación (`/verify-email`) para usuarios no verificados que intenten acceder al dashboard estudiantil, sandbox, lecciones o funciones docentes.
   - Interfaz gráfica moderna y responsiva (`VerifyEmail.vue`) con soporte para reenvío de correos, estado de carga y cierre de sesión.
